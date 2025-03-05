@@ -1,6 +1,6 @@
 # **Automated Non-Critical Patch Management Using Ansible**
 
-## **📌 Project Overview**
+## ** Project Overview**
 This project automates **non-critical patch updates** across multiple operating systems using **Ansible roles**. Each OS distribution has a dedicated role for modularity and maintainability. The playbook executes tasks such as:
 - **Fetching available non-critical patches**
 - **Applying updates**
@@ -11,30 +11,30 @@ This project automates **non-critical patch updates** across multiple operating 
 ## **📁 Project Structure**
 ```
 patching_automation/
-│-- inventory.yml         # Ansible inventory file
-│-- site.yml              # Main playbook to call OS-specific roles
+│-- inventory.yml         
+│-- site.yml             
 │-- roles/
-│   ├── ubuntu_debian/    # Role for Ubuntu/Debian
+│   ├── ubuntu_debian/    
 │   │   ├── tasks/
 │   │   │   ├── main.yml
 │   │   ├── templates/
 │   │   │   ├── pre_patch_email.j2
 │   │   │   ├── post_patch_email.j2
-│   ├── centos_rhel/      # Role for CentOS/RHEL
+│   ├── centos_rhel/     
 │   │   ├── tasks/
 │   │   │   ├── main.yml
 │   │   ├── templates/
 │   │   │   ├── pre_patch_email.j2
 │   │   │   ├── post_patch_email.j2
-│   ├── suse/             # Role for SUSE Linux
+│   ├── suse/             
 │   │   ├── tasks/
 │   │   │   ├── main.yml
 │   │   ├── templates/
 │   │   │   ├── pre_patch_email.j2
 │   │   │   ├── post_patch_email.j2
 │-- group_vars/
-│   ├── all.yml           # Global variables (email, patch directory, etc.)
-│-- README.md             # Project documentation
+│   ├── all.yml          
+│-- README.md            
 ```
 
 ## **🔧 Setup & Prerequisites**
@@ -100,9 +100,9 @@ Two email templates are used:
   {% endfor %}
   ```
 
-## **🔍 Debugging & Logs**
-- If an error occurs, use `-vvvv` for verbose mode:
-  ```bash
+## **🔍 Debugging and logs:
+use the command:
+
   ansible-playbook -i inventory.yml site.yml -vvvv
-  ```
-- Logs are stored in the **patching directory** (`/home/adminuser/non_critical_patching/`).
+
+
