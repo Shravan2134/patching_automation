@@ -1,0 +1,16 @@
+---
+- name: Ensure patching directory exists
+  file:
+    path: "{{ patch_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Get list of available updates
+  shell: "zypper list-updates | awk 'NR>2 {print $3}'"
+  register: non_critical_patches
+
+- name: Install updates
+  shell: "sudo zypper update -y {{ item }}"
+  loop: "{{ non_critical_patches.stdout_lines }}"
+  register: patch_results
+  ignore_errors: yes

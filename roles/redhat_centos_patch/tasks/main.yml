@@ -1,0 +1,22 @@
+---
+- name: Ensure patching directory exists
+  file:
+    path: "{{ patch_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Get list of available updates
+  shell: "yum list updates | awk 'NR>2 {print $1}'"
+  register: non_critical_patches
+
+- name: Save patch list to file
+  copy:
+    content: "{{ non_critical_patches.stdout }}"
+    dest: "{{ patch_dir }}/{{ pre_patch_file }}"
+    mode: '0644'
+
+- name: Install updates
+  shell: "sudo yum update -y {{ item }}"
+  loop: "{{ non_critical_patches.stdout_lines }}"
+  register: patch_results
+  ignore_errors: yes

@@ -1,0 +1,75 @@
+---
+- name: Ensure patching directory exists
+  file:
+    path: "{{ patch_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Get list of upgradable packages
+  shell: "apt list --upgradable 2>/dev/null | grep -v security | grep -v 'Listing...' | awk '{print $1}' | awk -F '/' '{print $1}'"
+  register: non_critical_patches
+
+- name: Save patch list to file
+  copy:
+    content: "{{ non_critical_patches.stdout }}"
+    dest: "{{ patch_dir }}/{{ pre_patch_file }}"
+    mode: '0644'
+
+- name: Fetch pre-patching report to controller
+  fetch:
+    src: "{{ patch_dir }}/{{ pre_patch_file }}"
+    dest: "./{{ pre_patch_file }}"
+    flat: yes
+
+- name: Send pre-patching report via email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "{{ email_username }}"
+    password: "{{ email_password }}"
+    to: "{{ recipient_email }}"
+    subject: "Pre-Patching Report for {{ inventory_hostname }}"
+    body: "{{ lookup('template', 'pre_patch_email.j2') }}"
+    # body: "{{ lookup('file', './' + pre_patch_file) }}"
+    attach: "./{{ pre_patch_file }}"
+  delegate_to: localhost
+
+
+- name: Install updates
+  shell: "sudo apt-get install -y {{ item }}"
+  loop: "{{ non_critical_patches.stdout_lines }}"
+  register: patch_results
+  ignore_errors: yes
+
+- name: Create post-patching report file
+  copy:
+    content: "Patching Report for {{ inventory_hostname }}\n"
+    dest: "{{ patch_dir }}/{{ post_patch_file }}"
+    mode: '0644'
+
+- name: Add patch results to report
+  blockinfile:
+    path: "{{ patch_dir }}/{{ post_patch_file }}"
+    block: |
+      {% for result in patch_results.results %}
+      Package: {{ result.item }} - Status: {% if result.rc == 0 %} SUCCESS {% else %} FAILED {% endif %}
+      {% endfor %}
+  when: patch_results.results is defined
+
+- name: Fetch post-patching report to controller
+  fetch:
+    src: "{{ patch_dir }}/{{ post_patch_file }}"
+    dest: "./{{ post_patch_file }}"
+    flat: yes
+
+- name: Send post-patching report via email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "{{ email_username }}"
+    password: "{{ email_password }}"
+    to: "{{ recipient_email }}"
+    subject: "Post-Patching Report for {{ inventory_hostname }}"
+    body: "{{ lookup('template', 'post_patch_email.j2') }}"
+    attach: "./{{ post_patch_file }}"
+  delegate_to: localhost

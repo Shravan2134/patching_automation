@@ -1,0 +1,14 @@
+Subject: Pre-Patching Report for {{ inventory_hostname }}
+
+Hello,
+
+The following non-critical updates are pending for {{ inventory_hostname }}:
+
+{% if lookup('file', './' + pre_patch_file) %}
+{{ lookup('file', './' + pre_patch_file) }}
+{% else %}
+{% endif %}
+
+Best regards,  
+patching automtion system
+

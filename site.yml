@@ -1,0 +1,24 @@
+---
+- name: Apply Non-Critical Patches
+  hosts: all
+  become: yes
+  tasks:
+    - name: Detect OS and Distribution
+      ansible.builtin.set_fact:
+        os_family: "{{ ansible_os_family | lower }}"
+        distribution: "{{ ansible_distribution | lower }}"
+
+    - name: Include Ubuntu/Debian Role
+      ansible.builtin.include_role:
+        name: ubuntu_debian_patch
+      when: os_family == "debian"
+
+    - name: Include RedHat/CentOS Role
+      ansible.builtin.include_role:
+        name: redhat_centos_patch
+      when: os_family == "redhat"
+
+    - name: Include SUSE Role
+      ansible.builtin.include_role:
+        name: suse_patch
+      when: os_family == "suse"
