@@ -1,0 +1,8 @@
+- name: Ensure Apache is installed
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present

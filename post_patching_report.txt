@@ -1,4 +1,4 @@
-Patching Report for host2
+Patching Report for gcp-host
 # BEGIN ANSIBLE MANAGED BLOCK
 
 # END ANSIBLE MANAGED BLOCK
